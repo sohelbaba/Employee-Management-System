@@ -10,6 +10,9 @@ class AuthenticationModel(db.Model):
 
     personal_details = db.relationship(
         'PersonalDetailsModel', backref='authentication')
+
+    task_details = db.relationship('TaskModel', backref='authentication')
+
     address_details = db.relationship(
         'AddressModel', backref='authentication')
 
