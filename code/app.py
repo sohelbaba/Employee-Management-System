@@ -3,6 +3,8 @@ from flask_restful import Api
 from resources.Employees import (
     EmployeeRegister, EmployeeLogin, EmployeePersonalDetails, Employee, EmployeeQualificationDetails,
     EmployeeAddressDetails, EmployeeSalaryDetails)
+
+from resources.Task import Task, TaskList
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
@@ -30,6 +32,9 @@ api.add_resource(EmployeeAddressDetails, '/employee/address')
 api.add_resource(EmployeeQualificationDetails, '/employee/qualification')
 api.add_resource(EmployeeSalaryDetails, '/employee/salaryinfo')
 
+# task api
+api.add_resource(Task, '/employee/task/<int:id>', '/employee/task')
+api.add_resource(TaskList, '/employee/tasks')
 
 if __name__ == '__main__':
     from config import db
