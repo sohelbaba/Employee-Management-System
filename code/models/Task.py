@@ -20,7 +20,6 @@ class TaskModel(db.Model):
 
     def json(self):
         return{
-            "Employee": self.emp_id,
             "Task": self.task,
             "Log": self.task_log,
             "DateTime": str(self.date).split('.')[0]

@@ -1,8 +1,14 @@
 from flask_restful import Resource, reqparse
 from models.Employee import (
-    AuthenticationModel, PersonalDetailsModel, AddressModel, QualificationModel, EmployeeSalaryDetailsModel)
+    AuthenticationModel, PersonalDetailsModel, AddressModel, QualificationModel,
+    EmployeeSalaryDetailsModel, JoiningDetailsModel, Annual_Leave, GradeModel)
+from models.Attendance import AttendanceModel
 from werkzeug.security import safe_str_cmp
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, get_raw_jwt
+from blacklist import blacklist
+from datetime import datetime
+from customeDecorators import admin_required, Hr_required
+from sqlalchemy import and_
 
 
 class EmployeeRegister(Resource):
@@ -14,6 +20,7 @@ class EmployeeRegister(Resource):
     parse.add_argument('role', type=str, required=True,
                        help='role is required')
 
+    @Hr_required
     def post(self):
         data = EmployeeRegister.parse.parse_args()
         employee = AuthenticationModel.find_by_username(data['username'])
@@ -25,6 +32,7 @@ class EmployeeRegister(Resource):
                     "error": "Username already exists"
                 }
             }
+
         employee = AuthenticationModel(**data)
         employee.save_to_db()
 
@@ -35,6 +43,41 @@ class EmployeeRegister(Resource):
         }
 
 
+class JoiningDetails(Resource):
+    parse = reqparse.RequestParser()
+    parse.add_argument('username', type=str, required=True,
+                       help='Username required')
+    parse.add_argument('joining_date', type=str,
+                       required=True, help='joining date required')
+
+    parse.add_argument('startdate', type=str, required=True,
+                       help='start date is required')
+    parse.add_argument('enddate', type=str, required=True,
+                       help='end date is required')
+    parse.add_argument('grade', type=str, required=True,
+                       help='grade is required')
+
+    @Hr_required
+    def post(self):
+        data = JoiningDetails.parse.parse_args()
+        employee = AuthenticationModel.find_by_username(data['username'])
+        if employee:
+            joining_date = datetime.strptime(data['joining_date'], "%d %B %Y")
+            joining_details = JoiningDetailsModel(employee.id, joining_date)
+            joining_details.save_to_db()
+
+            # here grade details
+            grade = GradeModel(
+                employee.id, data['startdate'], data['enddate'], data['grade'])
+            grade.save_to_db()
+
+            # here annual leave is set
+            annual_leave = Annual_Leave(employee.id)
+            annual_leave.save_to_db()
+
+            return {"status": 200}
+
+
 class EmployeeLogin(Resource):
     parse = reqparse.RequestParser()
     parse.add_argument('username', type=str, required=True,
@@ -42,10 +85,14 @@ class EmployeeLogin(Resource):
     parse.add_argument('password', type=str, required=True,
                        help='password is required')
 
-    def get(self):
+    def post(self):
         data = EmployeeLogin.parse.parse_args()
         employee = AuthenticationModel.find_by_username(data['username'])
         if employee and safe_str_cmp(data['password'], employee.password):
+            Attend = AttendanceModel(employee.id, datetime.now().strftime(
+                "%H:%M:%S"), datetime.today().strftime("%d/%m/%Y"))
+            Attend.save_to_db()
+            # print(employee.id)
             return {
                 "access_token": create_access_token(identity=employee.id),
                 "success": True
@@ -258,23 +305,20 @@ class EmployeeSalaryDetails(Resource):
         return {"success": False, "error": "Not Found"}
 
 
-class EmployeeJoiningDetails(Resource):
-    parse = reqparse.RequestParser()
-    parse.add_argument('accountno', type=str, required=True,
-                       help='accountno is required')
-
+class EmployeeLogout(Resource):
+    @jwt_required
     def get(self):
-        pass
+        jti = get_raw_jwt()['jti']
+        blacklist.add(jti)
 
-    def post(self):
-        pass
+        attend = AttendanceModel.query.filter(and_(AttendanceModel.date == datetime.today(
+        ).strftime("%d/%m/%Y"), AttendanceModel.emp_id == get_jwt_identity())).first()
 
-    def put(self):
-        pass
+        attend.endtime = datetime.now().strftime(
+            "%H:%M:%S")
+        attend.save_to_db()
 
-
-class EmployeeGradeDetails(Resource):
-    pass
+        return {"msg": "Successfully logged out"}, 200
 
 
 class Employee(Resource):
@@ -283,9 +327,12 @@ class Employee(Resource):
         employee = AuthenticationModel.find_by_id(get_jwt_identity())
         return {
             "Employee":  employee.json(),
-            "personalDetails": PersonalDetailsModel.find_by_id(get_jwt_identity()).json(),
-            "AddressDetails": AddressModel.find_by_id(get_jwt_identity()).json(),
-            "QualificationDetails": QualificationModel.find_by_id(get_jwt_identity()).json(),
-            "SalaryInformation": EmployeeSalaryDetailsModel.find_by_id(get_jwt_identity()).json(),
             "success": True
         }
+
+
+class AllEmployees(Resource):
+    @Hr_required
+    def get(self):
+        employees = [auth.json() for auth in AuthenticationModel.query.all()]
+        return {"Employees": employees, "status": 200}

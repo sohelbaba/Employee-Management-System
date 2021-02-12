@@ -1,4 +1,6 @@
 from config import db
+import datetime
+from sqlalchemy import DateTime
 
 
 class AuthenticationModel(db.Model):
@@ -12,6 +14,13 @@ class AuthenticationModel(db.Model):
         'PersonalDetailsModel', backref='authentication')
 
     task_details = db.relationship('TaskModel', backref='authentication')
+
+    leave_details = db.relationship('LeaveModel', backref='authentication')
+
+    Annual_Leave = db.relationship('Annual_Leave', backref='authentication')
+
+    Attendance_details = db.relationship(
+        'AttendanceModel', backref='authentication')
 
     address_details = db.relationship(
         'AddressModel', backref='authentication')
@@ -36,14 +45,20 @@ class AuthenticationModel(db.Model):
     def json(self):
         return {
             "username": self.username,
-            "role": self.role
+            "role": self.role,
+            "Password": self.password,
+            "Task": [task.json() for task in self.task_details],
+            "Joining Details": [join.json() for join in self.joining_details],
+            "Grade Details": [grade.json() for grade in self.grade_details],
+            "Person Details": [personal.json() for personal in self.personal_details],
+            "Leave Details": [leave.json() for leave in self.leave_details]
         }
 
-    @classmethod
+    @ classmethod
     def find_by_username(cls, username):
         return AuthenticationModel.query.filter_by(username=username).first()
 
-    @classmethod
+    @ classmethod
     def find_by_id(cls, id):
         return AuthenticationModel.query.filter_by(id=id).first()
 
@@ -96,9 +111,9 @@ class PersonalDetailsModel(db.Model):
             "AadharCard No.": self.aadharcardno
         }
 
-    @classmethod
+    @ classmethod
     def find_by_id(cls, id):
-        return PersonalDetailsModel.query.filter_by(id=id).first()
+        return PersonalDetailsModel.query.filter_by(emp_id=id).first()
 
     def save_to_db(self):
         db.session.add(self)
@@ -146,9 +161,9 @@ class AddressModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    @classmethod
+    @ classmethod
     def find_by_id(cls, id):
-        return AddressModel.query.filter_by(id=id).first()
+        return AddressModel.query.filter_by(emp_id=id).first()
 
     def update_to_db(self, city, state, pincode, fulladdress):
         self.city = city
@@ -191,9 +206,9 @@ class QualificationModel(db.Model):
 
         db.session.commit()
 
-    @classmethod
+    @ classmethod
     def find_by_id(cls, id):
-        return QualificationModel.query.filter_by(id=id).first()
+        return QualificationModel.query.filter_by(emp_id=id).first()
 
 
 class EmployeeSalaryDetailsModel(db.Model):
@@ -218,9 +233,9 @@ class EmployeeSalaryDetailsModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    @classmethod
+    @ classmethod
     def find_by_id(cls, id):
-        return EmployeeSalaryDetailsModel.query.filter_by(id=id).first()
+        return EmployeeSalaryDetailsModel.query.filter_by(emp_id=id).first()
 
     def json(self):
         return {
@@ -244,8 +259,8 @@ class GradeModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     emp_id = db.Column(db.Integer, db.ForeignKey('authentication.id'))
     grade = db.Column(db.String(25), nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
+    start_date = db.Column(db.String(10), nullable=False)
+    end_date = db.Column(db.String(10), nullable=False)
 
     def __init__(self, emp_id, grade, start_date, end_date):
         self.emp_id = emp_id
@@ -257,9 +272,16 @@ class GradeModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    @classmethod
+    def json(self):
+        return {
+            "Grade": self.grade,
+            "Start_Date": self.start_date,
+            "End_Date": self.end_date
+        }
+
+    @ classmethod
     def find_by_id(cls, id):
-        return GradeModel.query.filter_by(id=id).first()
+        return GradeModel.query.filter_by(emp_id=id).first()
 
 
 class JoiningDetailsModel(db.Model):
@@ -267,13 +289,13 @@ class JoiningDetailsModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     emp_id = db.Column(db.Integer, db.ForeignKey('authentication.id'))
     deactivate_by = db.Column(db.Integer, default=None)
-    join_date = db.Column(db.DateTime, nullable=False)
-    leave_date = db.Column(db.DateTime, default=None)
+    join_date = db.Column(db.String(10), nullable=False)
+    leave_date = db.Column(db.String(10), default=None)
     status = db.Column(db.Boolean, default=True)
 
-    def __init__(self, emp_id, join_date):
+    def __init__(self, emp_id, joining_date):
         self.emp_id = emp_id
-        self.join_date = join_date
+        self.join_date = joining_date
 
     def json(self):
         return{
@@ -284,6 +306,35 @@ class JoiningDetailsModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    @ classmethod
+    def find_by_id(cls, id):
+        return JoiningDetailsModel.query.filter_by(emp_id=id).first()
+
+
+class Annual_Leave(db.Model):
+    __tablename__ = 'annualleave'
+    id = db.Column(db.Integer, primary_key=True)
+    emp_id = db.Column(db.Integer, db.ForeignKey('authentication.id'))
+    pl = db.Column(db.Integer, default=12)
+    sl = db.Column(db.Integer, default=4)
+    cl = db.Column(db.Integer, default=4)
+    lwp = db.Column(db.Integer, default=5)
+
+    def __init__(self, emp_id):
+        self.emp_id = emp_id
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def json(self):
+        return{
+            "PL": self.pl,
+            "SL": self.sl,
+            "CL": self.cl,
+            "LWP": self.lwp
+        }
+
     @classmethod
     def find_by_id(cls, id):
-        return JoiningDetailsModel.query.filter_by(id=id).first()
+        return Annual_Leave.query.filter_by(emp_id=id).first()
