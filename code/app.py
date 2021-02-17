@@ -11,7 +11,20 @@ from blacklist import blacklist
 
 # app = Flask(__name__)
 # app.secret_key = 'EmployeeManagementSystem'
-from app_init import app, jwt, api
+# from run import app, jwt, api
+
+
+from flask import Flask
+from flask_restful import Api
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
+app.secret_key = 'EmployeeManagementSystem'
+
+api = Api(app)
+jwt = JWTManager(app)
 
 # set database url
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///employee.db'

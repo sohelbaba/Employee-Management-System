@@ -34,7 +34,8 @@ class Leave(Resource):
 
 
 class LeaveApply(Resource):
-    @Hr_required
+    # @Hr_required
+    @jwt_required
     def put(self, id):
         parse = reqparse.RequestParser()
         parse.add_argument('status', type=str,
