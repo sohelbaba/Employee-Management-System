@@ -38,7 +38,13 @@ def check_if_token_in_blacklist(decrypted_token):
     return jti in blacklist
 
 
+@app.route('/', methods=['GET'])
+def home():
+    return '''<h1>Distant Reading Archive</h1>
+<p>A prototype API for distant reading of science fiction novels.</p>'''
+
 # employee's Api
+
 
 # employee login / logout
 api.add_resource(EmployeeLogin, '/employee/login')  # done
