@@ -87,7 +87,6 @@ class EmployeeLogin(Resource):
     parse.add_argument('password', type=str, required=True,
                        help='password is required')
 
-    @jwt_required
     def post(self):
         data = EmployeeLogin.parse.parse_args()
         employee = AuthenticationModel.find_by_username(data['username'])
