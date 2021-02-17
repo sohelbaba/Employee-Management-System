@@ -18,6 +18,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from config import db
 
 app = Flask(__name__)
 CORS(app)
@@ -69,7 +70,7 @@ api.add_resource(AllGrades, '/designations')  # done
 api.add_resource(LeaveApply, '/leave/apply')  # done
 
 
-if __name__ == '__main__':
-    from config import db
-    db.init_app(app)
-    app.run()
+# if __name__ == '__main__':
+# from config import db
+db.init_app(app)
+app.run()
