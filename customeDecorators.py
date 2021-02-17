@@ -9,7 +9,7 @@ def admin_required(fn):
     def wrapper(*args, **kwargs):
         verify_jwt_in_request()
         claims = get_jwt_claims()
-        if claims['roles'] != 'admin':
+        if claims['roles'] != 'Admin':
             return {"msg": 'Admins only!'}, 403
         else:
             return fn(*args, **kwargs)

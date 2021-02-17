@@ -1,6 +1,8 @@
 from resources.Employees import (
     EmployeeRegister, EmployeeLogin, EmployeePersonalDetails, Employee, EmployeeQualificationDetails,
     EmployeeAddressDetails, EmployeeSalaryDetails, EmployeeLogout, JoiningDetails, AllEmployees)
+from resources.Admin import Admin
+from resources.setup import Setup
 
 from resources.Designation import AllGrades
 from resources.Leave import Leave, LeaveApply, Leaves
@@ -11,21 +13,8 @@ from blacklist import blacklist
 
 # app = Flask(__name__)
 # app.secret_key = 'EmployeeManagementSystem'
-# from run import app, jwt, api
+from app_init import app, jwt, api
 
-
-from flask import Flask
-from flask_restful import Api
-from flask_jwt_extended import JWTManager
-from flask_cors import CORS
-from config import db
-
-app = Flask(__name__)
-CORS(app)
-app.secret_key = 'EmployeeManagementSystem'
-
-api = Api(app)
-jwt = JWTManager(app)
 
 # set database url
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///employee.db'
@@ -38,13 +27,16 @@ def check_if_token_in_blacklist(decrypted_token):
     return jti in blacklist
 
 
-@app.route('/', methods=['GET'])
-def home():
-    return '''<h1>Distant Reading Archive</h1>
-<p>A prototype API for distant reading of science fiction novels.</p>'''
+@app.before_first_request
+def init_db():
+    db.create_all()
 
-# employee's Api
 
+# Setup Api
+api.add_resource(Setup, '/setup')
+
+# admin api
+api.add_resource(Admin, '/register', '/delete')
 
 # employee login / logout
 api.add_resource(EmployeeLogin, '/employee/login')  # done
@@ -76,7 +68,7 @@ api.add_resource(AllGrades, '/designations')  # done
 api.add_resource(LeaveApply, '/leave/apply')  # done
 
 
-# if __name__ == '__main__':
-# from config import db
-db.init_app(app)
-app.run()
+if __name__ == '__main__':
+    from config import db
+    db.init_app(app)
+    app.run(debug=True)
