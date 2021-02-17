@@ -2,7 +2,7 @@ from flask_restful import reqparse, Resource
 from models.Leave import LeaveModel
 from models.Employee import Annual_Leave
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from customeDecorators import admin_required, Hr_required
+from customeDecorators import admin_required, Hr_required, Authentication_required
 
 import datetime
 from sqlalchemy import DateTime
@@ -34,8 +34,7 @@ class Leave(Resource):
 
 
 class LeaveApply(Resource):
-    # @Hr_required
-    @jwt_required
+    @Authentication_required
     def put(self, id):
         parse = reqparse.RequestParser()
         parse.add_argument('status', type=str,

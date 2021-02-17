@@ -7,10 +7,10 @@ from werkzeug.security import safe_str_cmp
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, get_raw_jwt
 from blacklist import blacklist
 from datetime import datetime
-from customeDecorators import admin_required, Hr_required
+from customeDecorators import admin_required, Hr_required, Authentication_required
 from sqlalchemy import and_
 
-
+    
 class EmployeeRegister(Resource):
     parse = reqparse.RequestParser()
     parse.add_argument('username', type=str, required=True,
@@ -20,7 +20,7 @@ class EmployeeRegister(Resource):
     parse.add_argument('role', type=str, required=True,
                        help='role is required')
 
-    @Hr_required
+    @Authentication_required
     def post(self):
         data = EmployeeRegister.parse.parse_args()
         employee = AuthenticationModel.find_by_username(data['username'])
@@ -57,7 +57,7 @@ class JoiningDetails(Resource):
     parse.add_argument('grade', type=str, required=True,
                        help='grade is required')
 
-    @Hr_required
+    @Authentication_required
     def post(self):
         data = JoiningDetails.parse.parse_args()
         employee = AuthenticationModel.find_by_username(data['username'])
@@ -332,8 +332,7 @@ class Employee(Resource):
 
 
 class AllEmployees(Resource):
-    # @Hr_required
-    @jwt_required
+    @Authentication_required
     def get(self):
         employees = [auth.json() for auth in AuthenticationModel.query.all()]
         return {"Employees": employees, "status": 200}

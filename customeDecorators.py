@@ -4,6 +4,18 @@ from models.Employee import AuthenticationModel
 from functools import wraps
 
 
+def Authentication_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        verify_jwt_in_request()
+        claims = get_jwt_claims()
+        if claims['roles'] == 'Admin':
+            return fn(*args, **kwargs)
+        elif claims['roles'] == 'Hr':
+            return fn(*args, **kwargs)
+    return wrapper
+
+
 def admin_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
