@@ -68,7 +68,7 @@ class JoiningDetails(Resource):
 
             # here grade details
             grade = GradeModel(
-                employee.id, data['startdate'], data['enddate'], data['grade'])
+                employee.id, data['grade'], data['startdate'], data['enddate'])
             grade.save_to_db()
 
             # here annual leave is set

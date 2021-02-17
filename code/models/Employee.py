@@ -263,6 +263,7 @@ class GradeModel(db.Model):
     end_date = db.Column(db.String(10), nullable=False)
 
     def __init__(self, emp_id, grade, start_date, end_date):
+        print(grade)
         self.emp_id = emp_id
         self.grade = grade
         self.start_date = start_date
@@ -274,6 +275,7 @@ class GradeModel(db.Model):
 
     def json(self):
         return {
+            "Empid": self.emp_id,
             "Grade": self.grade,
             "Start_Date": self.start_date,
             "End_Date": self.end_date
