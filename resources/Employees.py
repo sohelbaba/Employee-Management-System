@@ -21,7 +21,7 @@ class EmployeeRegister(Resource):
                        help='role is required')
 
     # @Hr_required
-    @jwt_required
+    # @jwt_required
     def post(self):
         data = EmployeeRegister.parse.parse_args()
         employee = AuthenticationModel.find_by_username(data['username'])
