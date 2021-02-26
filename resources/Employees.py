@@ -22,6 +22,8 @@ from blacklist import blacklist
 from datetime import datetime
 from customeDecorators import admin_required, Hr_required, Authentication_required
 from sqlalchemy import and_
+from app_init import mail
+from flask_mail import Message
 
 
 class EmployeeRegister(Resource):
@@ -36,6 +38,8 @@ class EmployeeRegister(Resource):
                        help="joining Date  is required")
     parse.add_argument("designation", type=str, required=True,
                        help="designation is required")
+    parse.add_argument('email', type=str, required=True,
+                       help='email is required')
 
     @Authentication_required
     def post(self):
@@ -51,7 +55,7 @@ class EmployeeRegister(Resource):
             }
 
         employee = AuthenticationModel(
-            data['username'], data['password'], data['role'])
+            data['username'], data['password'], data['role'], data['email'])
         employee.save_to_db()
 
         # add  joining details
@@ -69,6 +73,29 @@ class EmployeeRegister(Resource):
         # annual leave
         annual_leave = Annual_Leave(employee.id)
         annual_leave.save_to_db()
+
+        # credential sent to user via email
+        msg = Message('Welcome to LaNet Teams!', recipients=[data['email']])
+        msg.body = '''
+        Hello  ''' + data['username'] + ''',
+        We are delighted to have you among us as a part of La net team software solutions Pvt. Ltd.
+        On behalf of all the members and the management, we would like to extend our warmest welcome and good wishes! Your Joining date will be ''' + data['joiningdate'] + ''' .\n
+
+        Here your credential for Company HRMS System.            
+        username = ''' + data['username'] + '''
+        password = ''' + data['password'] + '''
+        HRMS Link = 'http://127.0.0.1:3000/'
+
+        If you have any queries, please feel free to contact the Human Resources  Department. 
+        We look forward to your success in the company\n
+
+        Thanks & Regards,
+        Name of hr
+        HR Executive 
+        Direct: +91 6353235503 | W: www.lanetteam.com 
+        406, Luxuria Business Hub, Nr. VR Mall, Surat, Gujarat - 395007
+        Ground Floor, I.T.P.I Building, Beside Celebration Mall, Bhuwana, Udaipur, Rajasthan - 313001'''
+        mail.send(msg)
 
         return {
             "success": True,

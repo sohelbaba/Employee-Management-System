@@ -20,17 +20,17 @@ from resources.Designation import AllGrades
 from resources.Leave import Leave, LeaveApply, Leaves
 
 from resources.Task import Task, TaskList
-
 from blacklist import blacklist
 
 # app = Flask(__name__)
 # app.secret_key = 'EmployeeManagementSystem'
-from app_init import app, jwt, api
+from app_init import app, jwt, api, mail
 
 
 # set database url
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///employee.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
+
 
 
 @jwt.token_in_blacklist_loader
@@ -58,7 +58,8 @@ api.add_resource(ChangePassword, "/employee/changepassword")
 # employee profile
 api.add_resource(EmployeePersonalDetails, "/employee/profile")  # done
 api.add_resource(EmployeeAddressDetails, "/employee/address")  # done
-api.add_resource(EmployeeQualificationDetails, "/employee/qualification")  # done
+api.add_resource(EmployeeQualificationDetails,
+                 "/employee/qualification")  # done
 api.add_resource(EmployeeSalaryDetails, "/employee/salaryinfo")  # done
 api.add_resource(Employee, "/employee/details")  # done
 api.add_resource(Leaves, "/employee/leaves")  # done

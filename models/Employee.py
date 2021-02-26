@@ -11,8 +11,10 @@ class AuthenticationModel(db.Model):
     role = db.Column(db.String(10), nullable=False)
     isActive = db.Column(db.Boolean, default=True)
     isAuthenticate = db.Column(db.Boolean, default=False)
+    email = db.Column(db.String(35), default=None)
 
-    personal_details = db.relationship("PersonalDetailsModel", backref="authentication")
+    personal_details = db.relationship(
+        "PersonalDetailsModel", backref="authentication")
 
     task_details = db.relationship("TaskModel", backref="authentication")
 
@@ -20,7 +22,8 @@ class AuthenticationModel(db.Model):
 
     Annual_Leave = db.relationship("Annual_Leave", backref="authentication")
 
-    Attendance_details = db.relationship("AttendanceModel", backref="authentication")
+    Attendance_details = db.relationship(
+        "AttendanceModel", backref="authentication")
 
     address_details = db.relationship("AddressModel", backref="authentication")
 
@@ -32,22 +35,25 @@ class AuthenticationModel(db.Model):
         "EmployeeSalaryDetailsModel", backref="authentication"
     )
 
-    joining_details = db.relationship("JoiningDetailsModel", backref="authentication")
+    joining_details = db.relationship(
+        "JoiningDetailsModel", backref="authentication")
 
     grade_details = db.relationship("GradeModel", backref="authentication")
 
-    def __init__(self, username, password, role):
+    def __init__(self, username, password, role, email):
         self.username = username
         self.password = password
         self.role = role
+        self.email = email
 
     def json(self):
         return {
             "username": self.username,
             "role": self.role,
+            "email": self.email,
             "Password": self.password,
-            "isActive" :self.isActive,
-            "isAuthenticate" :self.isAuthenticate,
+            "isActive": self.isActive,
+            "isAuthenticate": self.isAuthenticate,
             "Task": [task.json() for task in self.task_details],
             "Address Details": [address.json() for address in self.address_details],
             "Salary Details": [sal.json() for sal in self.emp_sal_details],
@@ -324,7 +330,7 @@ class JoiningDetailsModel(db.Model):
     emp_id = db.Column(db.Integer, db.ForeignKey("authentication.id"))
     deactivate_by = db.Column(db.Integer, default=None)
     join_date = db.Column(db.String(10), nullable=False)
-    
+
     def __init__(self, emp_id, joining_date):
         self.emp_id = emp_id
         self.join_date = joining_date
