@@ -5,24 +5,31 @@ from sqlalchemy import DateTime
 
 class TaskModel(db.Model):
 
-    __tablename__ = 'task'
+    __tablename__ = "task"
 
     id = db.Column(db.Integer, primary_key=True)
-    emp_id = db.Column(db.Integer, db.ForeignKey('authentication.id'))
-    task = db.Column(db.Text, nullable=False)
-    task_log = db.Column(db.Text, nullable=False)
+    emp_id = db.Column(db.Integer, db.ForeignKey("authentication.id"))
+    desc = db.Column(db.Text, nullable=False)
+    technology = db.Column(db.String(50), nullable=False)
+    projectname = db.Column(db.String(50), nullable=False)
+    hour = db.Column(db.Integer, nullable=False)
     date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    def __init__(self, emp_id, task, task_log):
+    def __init__(self, emp_id, technology, projectname, hour, desc):
         self.emp_id = emp_id
-        self.task = task
-        self.task_log = task_log
+        self.technology = technology
+        self.projectname = projectname
+        self.hour = hour
+        self.desc = desc
 
     def json(self):
-        return{
-            "Task": self.task,
-            "Log": self.task_log,
-            "DateTime": str(self.date).split('.')[0]
+        return {
+            "id": self.id,
+            "Technology": self.technology,
+            "ProjectName": self.projectname,
+            "hour": self.hour,
+            "desc": self.desc,
+            "DateTime": str(self.date).split(".")[0],
         }
 
     @classmethod
@@ -31,4 +38,8 @@ class TaskModel(db.Model):
 
     def save_to_db(self):
         db.session.add(self)
+        db.session.commit()
+
+    def delete_from_db(self):
+        db.session.delete(self)
         db.session.commit()

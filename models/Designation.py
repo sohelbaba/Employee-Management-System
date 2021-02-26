@@ -12,6 +12,16 @@ class DesignationModel(db.Model):
         self.designation = designation
         self.basic = basic
 
+    @classmethod
+    def find_by_designation(cls, designation):
+        return DesignationModel.query.filter_by(designation=designation).first()
+
+    def json(self):
+        return{
+            "Designation": self.designation,
+            "Basic": self.basic
+        }
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()

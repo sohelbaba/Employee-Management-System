@@ -1,6 +1,18 @@
+from flask_migrate import Migrate
+from config import db
 from resources.Employees import (
-    EmployeeRegister, EmployeeLogin, EmployeePersonalDetails, Employee, EmployeeQualificationDetails,
-    EmployeeAddressDetails, EmployeeSalaryDetails, EmployeeLogout, JoiningDetails, AllEmployees)
+    EmployeeRegister,
+    EmployeeLogin,
+    EmployeePersonalDetails,
+    Employee,
+    EmployeeQualificationDetails,
+    EmployeeAddressDetails,
+    EmployeeSalaryDetails,
+    EmployeeLogout,
+    JoiningDetails,
+    AllEmployees,
+    ChangePassword,
+)
 from resources.Admin import Admin
 from resources.setup import Setup
 
@@ -17,13 +29,13 @@ from app_init import app, jwt, api
 
 
 # set database url
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///employee.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///employee.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
-    jti = decrypted_token['jti']
+    jti = decrypted_token["jti"]
     return jti in blacklist
 
 
@@ -33,42 +45,45 @@ def init_db():
 
 
 # Setup Api
-api.add_resource(Setup, '/setup')
+api.add_resource(Setup, "/setup")
 
 # admin api
-api.add_resource(Admin, '/register', '/delete')
+api.add_resource(Admin, "/register", "/delete")
 
 # employee login / logout
-api.add_resource(EmployeeLogin, '/employee/login')  # done
-api.add_resource(EmployeeLogout, '/employee/logout')  # done
+api.add_resource(EmployeeLogin, "/employee/login")  # done
+api.add_resource(EmployeeLogout, "/employee/logout")  # done
+api.add_resource(ChangePassword, "/employee/changepassword")
 
 # employee profile
-api.add_resource(EmployeePersonalDetails, '/employee/profile')  # done
-api.add_resource(EmployeeAddressDetails, '/employee/address')  # done
-api.add_resource(EmployeeQualificationDetails,
-                 '/employee/qualification')  # done
-api.add_resource(EmployeeSalaryDetails, '/employee/salaryinfo')  # done
-api.add_resource(Employee, '/employee/details')  # done
-api.add_resource(Leaves, '/employee/leaves')  # done
+api.add_resource(EmployeePersonalDetails, "/employee/profile")  # done
+api.add_resource(EmployeeAddressDetails, "/employee/address")  # done
+api.add_resource(EmployeeQualificationDetails, "/employee/qualification")  # done
+api.add_resource(EmployeeSalaryDetails, "/employee/salaryinfo")  # done
+api.add_resource(Employee, "/employee/details")  # done
+api.add_resource(Leaves, "/employee/leaves")  # done
 
 # employee task
-api.add_resource(Task, '/employee/task/<int:id>', '/employee/task')  # done
-api.add_resource(TaskList, '/employee/tasks')  # done
+api.add_resource(Task, "/employee/task/<int:id>", "/employee/task")  # done
+api.add_resource(TaskList, "/employee/tasks")  # done
 
 # employee leave
-api.add_resource(Leave, '/employee/leave')  # done
+api.add_resource(Leave, "/employee/leave")  # done
 
 # Hr Api's
-api.add_resource(EmployeeRegister, '/employee/register',
-                 '/employee/<string:username>')  # done
-api.add_resource(AllEmployees, '/employee/data')  # done
+api.add_resource(
+    EmployeeRegister, "/employee/register", "/employee/<string:username>"
+)  # done
+api.add_resource(AllEmployees, "/employee/data")  # done
 
-api.add_resource(JoiningDetails, '/employee/joiningdetails')  # done
-api.add_resource(AllGrades, '/designations')  # done
-api.add_resource(LeaveApply, '/leave/apply')  # done
+api.add_resource(JoiningDetails, "/employee/joiningdetails")  # done
+api.add_resource(AllGrades, "/designations", "/getdesignation")  # done
+api.add_resource(LeaveApply, "/leave/apply")  # done
 
 
-if __name__ == '__main__':
-    from config import db
-    db.init_app(app)
+migrate = Migrate()
+db.init_app(app)
+migrate.init_app(app, db, render_as_batch=True)
+
+if __name__ == "__main__":
     app.run(debug=True)
