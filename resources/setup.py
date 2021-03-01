@@ -10,6 +10,8 @@ class Setup(Resource):
                        help='password is required')
     parse.add_argument('role', type=str, required=True,
                        help='role is required')
+    parse.add_argument('email', type=str, required=True,
+                       help='email is required')
 
     def post(self):
         data = Setup.parse.parse_args()

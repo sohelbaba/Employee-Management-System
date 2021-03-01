@@ -1,6 +1,7 @@
 from config import db
 import datetime
 from sqlalchemy import DateTime
+from models.Employee import AuthenticationModel
 
 
 class LeaveModel(db.Model):
@@ -29,6 +30,8 @@ class LeaveModel(db.Model):
             "End Date": str(self.end_date),
             "Apply Date": str(self.apply_date),
             "Status": self.status,
+            "id": self.emp_id,
+            # "Username": AuthenticationModel.find_by_id(self.emp_id).username,
             "Description": self.leave_Description,
         }
 

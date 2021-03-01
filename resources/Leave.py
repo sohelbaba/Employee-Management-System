@@ -12,14 +12,16 @@ class Leave(Resource):
     @jwt_required
     def post(self):
         parse = reqparse.RequestParser()
-        parse.add_argument("ltype", type=str, required=True, help="Leave Type Required")
+        parse.add_argument("ltype", type=str, required=True,
+                           help="Leave Type Required")
         parse.add_argument(
             "startdate", type=str, required=True, help="start_date Type Required"
         )
         parse.add_argument(
             "enddate", type=str, required=True, help="end_date Type Required"
         )
-        parse.add_argument("desc", type=str, required=True, help="desc Type Required")
+        parse.add_argument("desc", type=str, required=True,
+                           help="desc Type Required")
 
         data = parse.parse_args()
         leave = LeaveModel(
@@ -64,3 +66,10 @@ class Leaves(Resource):
         if leave:
             return {"Leaves": leave.json()}
         return {"Status": Annual_Leave.query.all()}
+
+
+class AllLeaves(Resource):
+    @Authentication_required
+    def get(self):
+        leave = [leave.json() for leave in LeaveModel.query.all()]
+        return {"Leaves": leave}

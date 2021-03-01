@@ -17,9 +17,9 @@ from resources.Admin import Admin
 from resources.setup import Setup
 
 from resources.Designation import AllGrades
-from resources.Leave import Leave, LeaveApply, Leaves
+from resources.Leave import Leave, LeaveApply, Leaves, AllLeaves
 
-from resources.Task import Task, TaskList
+from resources.Task import Task, TaskList, AllTaskList
 from blacklist import blacklist
 
 # app = Flask(__name__)
@@ -30,7 +30,6 @@ from app_init import app, jwt, api, mail
 # set database url
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///employee.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
-
 
 
 @jwt.token_in_blacklist_loader
@@ -67,9 +66,11 @@ api.add_resource(Leaves, "/employee/leaves")  # done
 # employee task
 api.add_resource(Task, "/employee/task/<int:id>", "/employee/task")  # done
 api.add_resource(TaskList, "/employee/tasks")  # done
+api.add_resource(AllTaskList, "/employee/Alltasks")
 
 # employee leave
 api.add_resource(Leave, "/employee/leave")  # done
+api.add_resource(AllLeaves, '/employee/AllLeaves')
 
 # Hr Api's
 api.add_resource(

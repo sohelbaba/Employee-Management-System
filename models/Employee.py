@@ -14,31 +14,36 @@ class AuthenticationModel(db.Model):
     email = db.Column(db.String(35), default=None)
 
     personal_details = db.relationship(
-        "PersonalDetailsModel", backref="authentication")
+        "PersonalDetailsModel", cascade="all,delete", backref="authentication")
 
-    task_details = db.relationship("TaskModel", backref="authentication")
+    task_details = db.relationship(
+        "TaskModel", cascade="all,delete", backref="authentication")
 
-    leave_details = db.relationship("LeaveModel", backref="authentication")
+    leave_details = db.relationship(
+        "LeaveModel", cascade="all,delete", backref="authentication")
 
-    Annual_Leave = db.relationship("Annual_Leave", backref="authentication")
+    Annual_Leave = db.relationship(
+        "Annual_Leave", cascade="all,delete", backref="authentication")
 
     Attendance_details = db.relationship(
-        "AttendanceModel", backref="authentication")
+        "AttendanceModel", cascade="all,delete", backref="authentication")
 
-    address_details = db.relationship("AddressModel", backref="authentication")
+    address_details = db.relationship(
+        "AddressModel", cascade="all,delete", backref="authentication")
 
     qualification_details = db.relationship(
-        "QualificationModel", backref="authentication"
+        "QualificationModel", cascade="all,delete", backref="authentication"
     )
 
     emp_sal_details = db.relationship(
-        "EmployeeSalaryDetailsModel", backref="authentication"
+        "EmployeeSalaryDetailsModel", cascade="all,delete", backref="authentication"
     )
 
     joining_details = db.relationship(
-        "JoiningDetailsModel", backref="authentication")
+        "JoiningDetailsModel", cascade="all,delete", backref="authentication")
 
-    grade_details = db.relationship("GradeModel", backref="authentication")
+    grade_details = db.relationship(
+        "GradeModel", cascade="all,delete", backref="authentication")
 
     def __init__(self, username, password, role, email):
         self.username = username

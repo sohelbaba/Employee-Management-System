@@ -1,6 +1,7 @@
 from config import db
 import datetime
 from sqlalchemy import DateTime
+from models.Employee import AuthenticationModel
 
 
 class TaskModel(db.Model):
@@ -25,6 +26,7 @@ class TaskModel(db.Model):
     def json(self):
         return {
             "id": self.id,
+            "Username": AuthenticationModel.find_by_id(self.emp_id).username,
             "Technology": self.technology,
             "ProjectName": self.projectname,
             "hour": self.hour,

@@ -475,7 +475,8 @@ class Employee(Resource):
 class AllEmployees(Resource):
     @Authentication_required
     def get(self):
-        employees = [auth.json() for auth in AuthenticationModel.query.all()]
+        employees = [auth.json() for auth in AuthenticationModel.query.filter(
+            AuthenticationModel.role != 'Admin')]
         return {"Employees": employees, "status": 200}
 
 

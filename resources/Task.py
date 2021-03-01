@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 from models.Task import TaskModel
+from customeDecorators import Authentication_required
 
 
 class Task(Resource):
@@ -12,7 +13,8 @@ class Task(Resource):
     parse.add_argument(
         "projectname", type=str, required=True, help="projectname is required"
     )
-    parse.add_argument("hour", type=int, required=True, help="hour is required")
+    parse.add_argument("hour", type=int, required=True,
+                       help="hour is required")
     parse.add_argument(
         "desc", type=str, required=True, help="task desc entry is required"
     )
@@ -35,7 +37,7 @@ class Task(Resource):
             data["desc"],
         )
         task.save_to_db()
-        return {"status": 201, "new": False, "data": task.json()}
+        return {"status": 201, "new": False, "Employee": get_jwt_identity()}
 
     @jwt_required
     def put(self, id):
@@ -62,4 +64,11 @@ class TaskList(Resource):
         tasks = [
             task.json() for task in TaskModel.query.filter_by(emp_id=get_jwt_identity())
         ]
+        return {"Tasks": tasks}
+
+
+class AllTaskList(Resource):
+    @Authentication_required
+    def get(self):
+        tasks = [task.json() for task in TaskModel.query.all()]
         return {"Tasks": tasks}
