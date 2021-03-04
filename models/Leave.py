@@ -28,10 +28,12 @@ class LeaveModel(db.Model):
         return {
             "Start Date": str(self.start_date),
             "End Date": str(self.end_date),
+            "Type": self.leave_type,
             "Apply Date": str(self.apply_date),
             "Status": self.status,
             "id": self.emp_id,
-            # "Username": AuthenticationModel.find_by_id(self.emp_id).username,
+            "leave_id": self.id,
+            "Username": AuthenticationModel.find_by_id(self.emp_id).username,
             "Description": self.leave_Description,
         }
 

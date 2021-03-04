@@ -79,7 +79,7 @@ class EmployeeRegister(Resource):
         msg.body = '''
         Hello  ''' + data['username'] + ''',
         We are delighted to have you among us as a part of La net team software solutions Pvt. Ltd.
-        On behalf of all the members and the management, we would like to extend our warmest welcome and good wishes! Your Joining date will be ''' + data['joiningdate'] + ''' .\n
+        On behalf of all the members and the management, we would like to extend our warmest welcome and good wishes! Your Joining date will be ''' + data['joiningdate'].split('T')[0] + ''' .\n
 
         Here your credential for Company HRMS System.            
         username = ''' + data['username'] + '''

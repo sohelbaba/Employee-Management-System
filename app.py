@@ -15,9 +15,10 @@ from resources.Employees import (
 )
 from resources.Admin import Admin
 from resources.setup import Setup
+from resources.salary import Salary, SalaryDetails, EmployeeSalaryList
 
 from resources.Designation import AllGrades
-from resources.Leave import Leave, LeaveApply, Leaves, AllLeaves
+from resources.Leave import Leave, LeaveApply, Leaves, AllLeaves, ApplyLeaves
 
 from resources.Task import Task, TaskList, AllTaskList
 from blacklist import blacklist
@@ -71,6 +72,9 @@ api.add_resource(AllTaskList, "/employee/Alltasks")
 # employee leave
 api.add_resource(Leave, "/employee/leave")  # done
 api.add_resource(AllLeaves, '/employee/AllLeaves')
+api.add_resource(ApplyLeaves, '/employee/applyleaves')
+
+api.add_resource(EmployeeSalaryList, '/employee/salarydetails')
 
 # Hr Api's
 api.add_resource(
@@ -80,8 +84,9 @@ api.add_resource(AllEmployees, "/employee/data")  # done
 
 api.add_resource(JoiningDetails, "/employee/joiningdetails")  # done
 api.add_resource(AllGrades, "/designations", "/getdesignation")  # done
-api.add_resource(LeaveApply, "/leave/apply")  # done
-
+api.add_resource(LeaveApply, "/leave/<int:id>")  # done
+api.add_resource(Salary, '/employee/salarygenerate')
+api.add_resource(SalaryDetails, '/salarydetails')
 
 migrate = Migrate()
 db.init_app(app)

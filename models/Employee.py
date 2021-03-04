@@ -306,7 +306,6 @@ class GradeModel(db.Model):
     basic = db.Column(db.Float(precision=2), nullable=False)
 
     def __init__(self, emp_id, grade, start_date, basic):
-
         self.emp_id = emp_id
         self.grade = grade
         self.start_date = start_date
