@@ -19,7 +19,7 @@ from flask_jwt_extended import (
     get_raw_jwt,
 )
 from blacklist import blacklist
-from datetime import datetime
+from datetime import datetime, date
 from customeDecorators import admin_required, Hr_required, Authentication_required
 from sqlalchemy import and_
 from app_init import mail
@@ -54,21 +54,28 @@ class EmployeeRegister(Resource):
                 }
             }
 
+        joindate = date.fromisoformat(data['joiningdate'].split('T')[0])
+
         employee = AuthenticationModel(
-            data['username'], data['password'], data['role'], data['email'])
+            data['username'], data['password'], data['role'], data['email'], joindate)
         employee.save_to_db()
 
         # add  joining details
-        joiningdetails = JoiningDetailsModel(employee.id, data['joiningdate'])
+
+        joiningdetails = JoiningDetailsModel(employee.id, joindate)
+        print(joiningdetails.json())
         joiningdetails.save_to_db()
 
         # fetch basic for particular designation
         des = DesignationModel.find_by_designation(data['designation'])
+        print(des.json())
 
         # add employee level grade
         grade = GradeModel(
-            employee.id, data['designation'], data['joiningdate'], des.basic)
+            employee.id, data['designation'], joindate, des.basic)
         grade.save_to_db()
+
+        print(grade.json())
 
         # annual leave
         annual_leave = Annual_Leave(employee.id)
@@ -77,7 +84,7 @@ class EmployeeRegister(Resource):
         # credential sent to user via email
         msg = Message('Welcome to LaNet Teams!', recipients=[data['email']])
         msg.body = '''
-        Hello  ''' + data['username'] + ''',
+        Hello  ''' + data['username'].split('.')[0] + ''',
         We are delighted to have you among us as a part of La net team software solutions Pvt. Ltd.
         On behalf of all the members and the management, we would like to extend our warmest welcome and good wishes! Your Joining date will be ''' + data['joiningdate'].split('T')[0] + ''' .\n
 
@@ -494,3 +501,11 @@ class ChangePassword(Resource):
             employee.save_to_db()
             return {"status": True}
         return {"Status": False}
+
+
+class EmployeeGradeHistory(Resource):
+    @jwt_required
+    def get(self):
+        grades = [grade.json() for grade in GradeModel.query.filter(
+            GradeModel.emp_id == get_jwt_identity())]
+        return{"Grades": grades}

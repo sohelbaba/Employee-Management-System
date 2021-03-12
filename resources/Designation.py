@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse
 from models.Designation import DesignationModel
 from flask_jwt_extended import jwt_required
-from customeDecorators import admin_required
+from customeDecorators import admin_required, Authentication_required
 
 
 class AllGrades(Resource):
@@ -22,7 +22,19 @@ class AllGrades(Resource):
         except:
             return {'status': 401}
 
-    @admin_required
+    @Authentication_required
+    def put(self):
+        data = AllGrades.parse.parse_args()
+
+        des = DesignationModel.find_by_designation(data['designation'])
+        if des:
+            des.basic = data['basic']
+            des.save_to_db()
+            return {'Status': 'updated'}
+
+        return{'Status': 'NotFound'}
+
+    @Authentication_required
     def get(self):
         designation = [desg.json() for desg in DesignationModel.query.all()]
         return {"designation": designation}

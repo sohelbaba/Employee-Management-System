@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 from models.Task import TaskModel
 from customeDecorators import Authentication_required
+import datetime as DT
 
 
 class Task(Resource):
@@ -70,5 +71,8 @@ class TaskList(Resource):
 class AllTaskList(Resource):
     @Authentication_required
     def get(self):
+        today = DT.date.today()
+        week_ago = today - DT.timedelta(days=7)
+
         tasks = [task.json() for task in TaskModel.query.all()]
         return {"Tasks": tasks}

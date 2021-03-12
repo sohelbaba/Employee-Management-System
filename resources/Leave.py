@@ -31,14 +31,29 @@ class Leave(Resource):
                            help="desc Type Required")
 
         data = parse.parse_args()
-        leave = LeaveModel(
-            get_jwt_identity(),
-            data["ltype"],
-            data["startdate"],
-            data["enddate"],
-            data["desc"],
-        )
-        leave.save_to_db()
+        employee = AuthenticationModel.find_by_id(get_jwt_identity())
+        if employee:
+            if employee.role == 'Hr':
+                leave = LeaveModel(
+                    get_jwt_identity(),
+                    data["ltype"],
+                    data["startdate"],
+                    data["enddate"],
+                    data["desc"],
+                    'Forward'
+                )
+                leave.save_to_db()
+            else:
+                leave = LeaveModel(
+                    get_jwt_identity(),
+                    data["ltype"],
+                    data["startdate"],
+                    data["enddate"],
+                    data["desc"],
+                    'Pending'
+                )
+                leave.save_to_db()
+
         return {
             "status": 200,
             "data": [leave.json() for leave in LeaveModel.query.all()],
@@ -111,18 +126,14 @@ class ApplyLeaves(Resource):
     def get(self):
         leave = [leave.json() for leave in LeaveModel.query.filter(
             LeaveModel.emp_id == get_jwt_identity())]
-        if leave:
-            return {"Leaves": leave}
-        return {"Status": Annual_Leave.query.all()}
+        return {"Leaves": leave}
 
 
 class Leaves(Resource):
     @jwt_required
     def get(self):
         leave = Annual_Leave.find_by_id(get_jwt_identity())
-        if leave:
-            return {"Leaves": leave.json()}
-        return {"Status": Annual_Leave.query.all()}
+        return {"Leaves": leave.json()}
 
 
 class AllLeaves(Resource):

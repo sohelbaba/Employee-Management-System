@@ -12,6 +12,7 @@ from resources.Employees import (
     JoiningDetails,
     AllEmployees,
     ChangePassword,
+    EmployeeGradeHistory
 )
 from resources.Admin import Admin
 from resources.setup import Setup
@@ -22,6 +23,8 @@ from resources.Leave import Leave, LeaveApply, Leaves, AllLeaves, ApplyLeaves
 
 from resources.Task import Task, TaskList, AllTaskList
 from blacklist import blacklist
+
+from resources.Reports import EmployeeReport, TaskReport, SalaryReport, LeaveReport
 
 # app = Flask(__name__)
 # app.secret_key = 'EmployeeManagementSystem'
@@ -75,6 +78,7 @@ api.add_resource(AllLeaves, '/employee/AllLeaves')
 api.add_resource(ApplyLeaves, '/employee/applyleaves')
 
 api.add_resource(EmployeeSalaryList, '/employee/salarydetails')
+api.add_resource(EmployeeGradeHistory, '/employee/gradeshistory')
 
 # Hr Api's
 api.add_resource(
@@ -87,6 +91,13 @@ api.add_resource(AllGrades, "/designations", "/getdesignation")  # done
 api.add_resource(LeaveApply, "/leave/<int:id>")  # done
 api.add_resource(Salary, '/employee/salarygenerate')
 api.add_resource(SalaryDetails, '/salarydetails')
+
+
+# report's
+api.add_resource(EmployeeReport, '/employee/reports')
+api.add_resource(TaskReport, '/task/reports')
+api.add_resource(SalaryReport, '/salary/reports')
+api.add_resource(LeaveReport, '/leave/reports')
 
 migrate = Migrate()
 db.init_app(app)

@@ -17,12 +17,13 @@ class LeaveModel(db.Model):
     status = db.Column(db.String(10), default="Pending")
     leave_Description = db.Column(db.Text, nullable=False)
 
-    def __init__(self, emp_id, leave_type, start_date, end_date, leave_Description):
+    def __init__(self, emp_id, leave_type, start_date, end_date, leave_Description, status=None):
         self.emp_id = emp_id
         self.leave_type = leave_type
         self.start_date = start_date
         self.end_date = end_date
         self.leave_Description = leave_Description
+        self.status = status
 
     def json(self):
         return {
@@ -39,7 +40,7 @@ class LeaveModel(db.Model):
 
     @classmethod
     def find_by_id(cls, id):
-        return LeaveModel.query.filter_by(id=id).first()
+        return LeaveModel.query.filter_by(emp_id=id).first()
 
     def save_to_db(self):
         db.session.add(self)

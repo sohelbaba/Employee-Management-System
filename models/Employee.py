@@ -1,17 +1,19 @@
 from config import db
 import datetime
 from sqlalchemy import DateTime
+from sqlalchemy.orm import backref
 
 
 class AuthenticationModel(db.Model):
     __tablename__ = "authentication"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(25), unique=True)
     password = db.Column(db.String(25), nullable=False)
     role = db.Column(db.String(10), nullable=False)
     isActive = db.Column(db.Boolean, default=True)
     isAuthenticate = db.Column(db.Boolean, default=False)
     email = db.Column(db.String(35), default=None)
+    join_date = db.Column(db.DateTime, nullable=None)
 
     personal_details = db.relationship(
         "PersonalDetailsModel", cascade="all,delete", backref="authentication")
@@ -40,16 +42,17 @@ class AuthenticationModel(db.Model):
     )
 
     joining_details = db.relationship(
-        "JoiningDetailsModel", cascade="all,delete", backref="authentication")
+        "JoiningDetailsModel", cascade="all,delete", backref=backref("authentication", uselist=False))
 
     grade_details = db.relationship(
         "GradeModel", cascade="all,delete", backref="authentication")
 
-    def __init__(self, username, password, role, email):
+    def __init__(self, username, password, role, email, joindate):
         self.username = username
         self.password = password
         self.role = role
         self.email = email
+        self.join_date = joindate
 
     def json(self):
         return {
@@ -301,8 +304,8 @@ class GradeModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     emp_id = db.Column(db.Integer, db.ForeignKey("authentication.id"))
     grade = db.Column(db.String(25), nullable=False)
-    start_date = db.Column(db.String(10), nullable=False)
-    end_date = db.Column(db.String(10), default=None)
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, default=None)
     basic = db.Column(db.Float(precision=2), nullable=False)
 
     def __init__(self, emp_id, grade, start_date, basic):
@@ -319,7 +322,8 @@ class GradeModel(db.Model):
         return {
             "Empid": self.emp_id,
             "Grade": self.grade,
-            "Start_Date": self.start_date,
+            "Start_Date": str(self.start_date),
+            "End Date": str(self.end_date),
             "Basic": self.basic,
         }
 
@@ -333,14 +337,14 @@ class JoiningDetailsModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     emp_id = db.Column(db.Integer, db.ForeignKey("authentication.id"))
     deactivate_by = db.Column(db.Integer, default=None)
-    join_date = db.Column(db.String(10), nullable=False)
+    join_date = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, emp_id, joining_date):
         self.emp_id = emp_id
         self.join_date = joining_date
 
     def json(self):
-        return {"Join Date": self.join_date}
+        return {"Join Date": str(self.join_date)}
 
     def save_to_db(self):
         db.session.add(self)
